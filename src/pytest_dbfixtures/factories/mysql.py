@@ -19,6 +19,7 @@
 import os
 import shutil
 import subprocess
+import sys
 from tempfile import mkdtemp
 
 import pytest
@@ -27,6 +28,8 @@ from path import path
 from pytest_dbfixtures.executors import TCPExecutor
 from pytest_dbfixtures.port import get_port
 from pytest_dbfixtures.utils import get_config
+
+PY3 = sys.version_info[0] == 3
 
 
 def remove_mysql_directory(datadir):
@@ -147,7 +150,14 @@ def mysql_proc(executable=None, admin_executable=None, init_executable=None,
                 '--user=%s' % config.mysql.user,
                 'shutdown'
             )
-            subprocess.check_output(' '.join(shutdown_server), shell=True, timeout=10)
+            if PY3:
+                subprocess.check_output(' '.join(shutdown_server), shell=True, timeout=10)
+            else:
+                try:
+                    subprocess.check_output(' '.join(shutdown_server), shell=True)
+                except Exception:
+                    # ignore timeout exception...
+                    pass
             mysql_executor.stop()
             remove_mysql_directory(tmpdir)
 
