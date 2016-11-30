@@ -147,7 +147,7 @@ def mysql_proc(executable=None, admin_executable=None, init_executable=None,
                 '--user=%s' % config.mysql.user,
                 'shutdown'
             )
-            subprocess.check_output(' '.join(shutdown_server), shell=True)
+            subprocess.check_output(' '.join(shutdown_server), shell=True, timeout=10)
             mysql_executor.stop()
             remove_mysql_directory(tmpdir)
 
